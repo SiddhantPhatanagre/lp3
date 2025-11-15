@@ -1,1 +1,53 @@
+//1
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report,accuracy_score , confusion_matrix
+from sklearn.neighbors import KNeighborsClassifier
+import matplotlib.pyplot as plt
 
+//2
+data=pd.read_csv("emails.csv")
+data.head()
+data = data.drop(["Email No."],axis=1)
+data.dropna(axis=0,inplace=True)
+data.shape
+data.isnull().sum()
+
+//3
+X = data.drop(columns= ['Prediction'])
+y = data['Prediction']
+X_train , X_test , y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+knn = KNeighborsClassifier(n_neighbors = 5)
+knn.fit(X_train,y_train)
+knn_pred = knn.predict(X_test)
+
+print("-------knn----------")
+print("accuracy: ", accuracy_score(y_test,knn_pred))
+print("confusion matrix: \n", confusion_matrix(y_test,knn_pred))
+print("classification report: \n", classification_report(y_test,knn_pred))
+
+//4
+
+svm = SVC(kernel='linear')
+svm.fit(X_train, y_train)
+svm_pred = svm.predict(X_test)
+
+print("-------svm----------")
+print("accuracy: ", accuracy_score(y_test,svm_pred))
+print("confusion matrix: \n", confusion_matrix(y_test,svm_pred))
+print("classification report: \n", classification_report(y_test,svm_pred))
+
+//5
+print("KNN Accuracy:", accuracy_score(y_test, knn_pred))
+print("SVM Accuracy:", accuracy_score(y_test, svm_pred))
+
+# Bar plot comparison
+acc_knn = accuracy_score(y_test, knn_pred)
+acc_svm = accuracy_score(y_test, svm_pred)
+
+plt.bar(['KNN', 'SVM'], [acc_knn, acc_svm], color=['blue', 'red'])
+plt.ylabel("Accuracy")
+plt.title("KNN vs SVM Accuracy Comparison")
+plt.show()
